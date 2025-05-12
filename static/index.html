@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple WebSocket Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      padding: 20px;
+    }
+
+    .chat-container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    #chat {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    #messageInput {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #sendButton {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #sendButton:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2>Simple WebSocket Chat</h2>
+    <div id="chat"></div>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button id="sendButton">Send</button>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("messageInput");
+    const button = document.getElementById("sendButton");
+
+    // Replace localhost with your server IP if needed
+    const ws = new WebSocket("ws://" + window.location.host + "/ws");
+
+    ws.onmessage = function(event) {
+      const msg = document.createElement("div");
+      msg.textContent = event.data;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    button.onclick = function() {
+      const message = input.value.trim();
+      if (message !== "") {
+        ws.send(message);
+        const selfMsg = document.createElement("div");
+        selfMsg.textContent = "You: " + message;
+        selfMsg.style.color = "#007bff";
+        chat.appendChild(selfMsg);
+        chat.scrollTop = chat.scrollHeight;
+        input.value = "";
+      }
+    };
+
+    input.addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        button.click();
+      }
+    });
+  </script>
+</body>
+</html>
